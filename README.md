@@ -1,7 +1,7 @@
 # json-to-sqlite
 Parses JSON files and stores the results in a SQLite database.
 
-Written with the C amalgamation of SQLite 3.38.0
+Written with SQLite [3.38.0](https://github.com/sqlite/sqlite/releases/tag/version-3.38.0) amalgamation file. Instructions for building the file can be found [on the SQLite website](https://www.sqlite.org/draft/amalgamation.html)..
 
 ## to use
 
