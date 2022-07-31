@@ -1,5 +1,7 @@
 # json-to-sqlite
- Parses JSON files and stores the data in an sqlite database.
+ Parses JSON files and stores the results in a database.
+ 
+ Written with the C amalgamation of SQLite 3.38.0
  
  ## to use
  
@@ -9,5 +11,7 @@
  
  ## caveats
 
+- The JSON file must begin with a dummy entry, formatted as "KEY" : "TYPE"
+- The primary key must be identified in the type string (i.e. "NAME" : "TEXT PRIMARY KEY NOT NULL")
 - One table per json file
 - Cannot handle binary data
