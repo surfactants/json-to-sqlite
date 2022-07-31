@@ -30,3 +30,19 @@
 *.exe
 *.out
 *.app
+
+# Output
+/bin/
+
+# Code::Blocks project files
+*.cbp
+*.depend
+*.layout
+
+# SQLite files
+/sqlite/
+*.db
+
+# git cruft
+.gitattributes
+_resources
