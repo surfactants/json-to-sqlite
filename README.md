@@ -1,13 +1,13 @@
 # json-to-sqlite
- parses json files and stores the data in an sqlite database
+ Parses JSON files and stores the data in an sqlite database.
  
  ## to use
  
- simply add your json files to `data/` and record them in `manifest.txt`
+ Simply add your JSON files to `data/` and record them in `manifest.txt`
  
- the example files are derived from a game for which i made this program
+ The example files are derived from a game, for which I made this program.
  
  ## caveats
 
-- one table per json file
-- cannot handle binary data
+- One table per json file
+- Cannot handle binary data
