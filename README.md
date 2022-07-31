@@ -14,5 +14,6 @@ The example files are derived from a game, for which I made this program. If you
 - Each JSON file must begin with a dummy entry, formatted as `"KEY":"TYPE"`
 - Primary key must be identified in the type string (i.e. "NAME" : "TEXT PRIMARY KEY NOT NULL")
 - Binary JSON files only need one value per entry (`"NAME":"FILENAME"`),
-- *except for the first*, which also requires `"DATA":"BLOB"`
+- *EXCEPT for the dummy entry*, which also requires `"DATA":"BLOB"`
+- If the filenames from the binary files do not exist
 - One table per json file
