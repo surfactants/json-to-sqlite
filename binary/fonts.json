@@ -1,5 +1,5 @@
 {
-"TEXTURES":[
+"FONTS":[
 	{
 		"NAME":"TEXT PRIMARY KEY NOT NULL",
 		"DATA":"BLOB"
