@@ -1,0 +1,20 @@
+{
+"VOLUME":[
+	{
+		"ID":"TEXT PRIMARY KEY NOT NULL",
+		"VALUE":"REAL",
+	},
+	{
+		"ID":"VOL_MUSIC",
+		"VALUE":"100.0",
+	},
+	{
+		"ID":"VOL_GAME",
+		"VALUE":"100.0",
+	},
+	{
+		"ID":"VOL_UI",
+		"VALUE":"100.0",
+	},
+]
+}
