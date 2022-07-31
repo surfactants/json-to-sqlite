@@ -7,7 +7,7 @@ Written with the C amalgamation of SQLite 3.38.0
 
 Simply add your JSON files to `data/` and record them in `manifest.txt`
 
-The example files are derived from a game, for which I made this program. If you're me, or you exist in an unknown future, it is accessible at surfactants/asteroids
+The example files are derived from a game, for which I made this program. If you're me, or you exist in an unknown future, it is accessible at [surfactants/asteroids](https://github.com/surfactants/asteroids)
 
 ## caveats
 
