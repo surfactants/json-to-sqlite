@@ -1,0 +1,56 @@
+{
+"TEXTURES":[
+	{
+		"NAME":"TEXT PRIMARY KEY NOT NULL",
+		"DATA":"BLOB"
+	},
+	{
+		"NAME":"textures/BUGS-MELEE_LIGHT.png"
+	},
+	{
+		"NAME":"textures/BUGS-MELEE_HEAVY.png"
+	},
+	{
+		"NAME":"textures/BUGS-RANGED.png"
+	},
+	{
+		"NAME":"textures/BUGS-TURRET.png"
+	},
+	{
+		"NAME":"textures/BUGS-BOSS.png"
+	},
+	{
+		"NAME":"textures/PIRATES-MELEE_LIGHT.png"
+	},
+	{
+		"NAME":"textures/PIRATES-MELEE_HEAVY.png"
+	},
+	{
+		"NAME":"textures/PIRATES-RANGED.png"
+	},
+	{
+		"NAME":"textures/PIRATES-TURRET.png"
+	},
+	{
+		"NAME":"textures/PIRATES-BOSS.png"
+	},
+	{
+		"NAME":"textures/ROBOTS-MELEE_LIGHT.png"
+	},
+	{
+		"NAME":"textures/ROBOTS-MELEE_HEAVY.png"
+	},
+	{
+		"NAME":"textures/ROBOTS-RANGED.png"
+	},
+	{
+		"NAME":"textures/ROBOTS-TURRET.png"
+	},
+	{
+		"NAME":"textures/ROBOTS-BOSS.png"
+	},
+	{
+		"NAME":"textures/PLAYER.png"
+	}
+]
+}

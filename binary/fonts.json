@@ -1,0 +1,14 @@
+{
+"TEXTURES":[
+	{
+		"NAME":"TEXT PRIMARY KEY NOT NULL",
+		"DATA":"BLOB"
+	},
+	{
+		"MENU":"fonts/MENU.ttf" //adventpro-bold.ttf
+	}
+	{
+		"NAME":"fonts/UI.ttf" //BubblerOne-Regular.ttf
+	}
+]
+}

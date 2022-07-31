@@ -40,38 +40,41 @@ int main(){
 
     //extract the filenames from manifest.txt
 
-
-    std::ifstream manifest;
-    manifest.open("manifest.txt", std::ios::in);
-
-    //if the file fails to open, return error code 2
-    if(!manifest.is_open()){
-        std::cout << "failed to open manifest.txt!";
-        return 2;
-    }
-
-    std::vector<std::string> filenames;
-
-    std::cout << "extracting filenames from manifest file:\n";
-
-    const std::string prefix = "data/";
-
-    while(manifest.good()){
-        std::string filename;
-        std::getline(manifest, filename);
-        filenames.push_back(prefix + filename);
-        std::cout << '\t' << filenames.back() << '\n';
-    }
-
-    std::cout << '\n';
+    std::cout << "\nclearing database...\n";
 
     littleBobbyTables(db);
 
-    addTables(db, filenames);
+    std::vector<std::string> filenames = extractFilenames("manifest.txt", "data/");
+    if(filenames.size() > 0){
+        std::cout << "\nadding standard tables...\n";
+
+        addTables(db, filenames);
+
+        std::cout << "\nstandard tables added!\n";
+
+        filenames.clear();
+    }
+    else{
+        std::cout << "\nno filenames for standard tables were found!";
+    }
+
+    filenames = extractFilenames("manifest_binary.txt", "binary/");
+    if(filenames.size() > 0){
+        std::cout << "\nadding binary tables...\n";
+
+        addBinaryTables(db, filenames);
+
+        std::cout << "\nbinary tables added!\n";
+
+        filenames.clear();
+    }
+    else{
+        std::cout << "\nno filenames for binary tables were found!\n";
+    }
 
     sqlite3_close(db);
 
-    std::cout << "data.db closed!\n";
+    std::cout << "\ndata.db closed!\n";
 
     return 0;
 }

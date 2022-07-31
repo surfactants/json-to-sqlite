@@ -25,10 +25,16 @@
 #include <string>
 #include <vector>
 
+std::vector<std::string> extractFilenames(std::string manifest_name, std::string prefix);
+
 std::string wrap(std::string str);
 
 void littleBobbyTables(sqlite3* db);
 
+void insertBlob(sqlite3* db, std::string fname, std::string tname, std::string bname);
+
 void addTables(sqlite3* db, std::vector<std::string> filenames); //adds text tables
+
+void addBinaryTables(sqlite3* db, std::vector<std::string> filenames);
 
 std::vector<std::pair<std::string, std::string>> convertBlock(std::vector<std::string> block);
