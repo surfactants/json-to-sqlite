@@ -3,12 +3,17 @@
 	{
 		"NAME":"TEXT PRIMARY KEY NOT NULL",
 		"DATA":"BLOB"
+		"TAG":"TEXT"
 	},
 	{
-		"MENU":"fonts/MENU.ttf" //adventpro-bold.ttf
+		"NAME":"MENU"
+		"FILENAME":"fonts/adventpro-bold.ttf"
+		"TAG":"EXAMPLE1"
 	}
 	{
-		"NAME":"fonts/UI.ttf" //BubblerOne-Regular.ttf
+		"NAME":"UI"
+		"FILENAME":"fonts/adventpro-bold.ttf"
+		"TAG":"EXAMPLE2"
 	}
 ]
 }

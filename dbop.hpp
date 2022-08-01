@@ -31,7 +31,7 @@ std::string wrap(std::string str);
 
 void littleBobbyTables(sqlite3* db);
 
-void insertBlob(sqlite3* db, std::string fname, std::string tname, std::string bname);
+void insertBlob(sqlite3* db, std::string fname, std::string tname, std::string bname, std::string pkey);
 
 void addTables(sqlite3* db, std::vector<std::string> filenames); //adds text tables
 

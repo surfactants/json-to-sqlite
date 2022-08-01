@@ -108,10 +108,11 @@ std::vector<std::pair<std::string, std::string>> convertBlock(std::vector<std::s
     return entries;
 }
 
-void insertBlob(sqlite3* db, std::string fname, std::string tname, std::string bname){
+void insertBlob(sqlite3* db, std::string fname, std::string tname, std::string bname, std::string pkey){
     std::cout << "inserting " << bname << " to " << tname << '\n';
     sqlite3_stmt* stmt;
-    std::string sql = "INSERT INTO " + tname + "('NAME', DATA) VALUES(?,?)";
+    //std::string sql = "UPDATE " + tname " SET "
+    std::string sql = "INSERT INTO " + tname + "('" + pkey + "', DATA) VALUES(?,?)";
     int rc;
 
     std::ifstream data(fname, std::ios::in | std::ios::binary);
@@ -124,7 +125,6 @@ void insertBlob(sqlite3* db, std::string fname, std::string tname, std::string b
 
     char* buffer = new char[size_img];
     data.read(buffer, size_img);
-
 
     rc = sqlite3_prepare(db, sql.c_str(), -1, &stmt, 0);
     if(rc != SQLITE_OK){
@@ -144,7 +144,6 @@ void insertBlob(sqlite3* db, std::string fname, std::string tname, std::string b
 
     delete[] buffer;
 }
-
 
 void addTables(sqlite3* db, std::vector<std::string> filenames){
     for(const auto& filename : filenames){
@@ -306,9 +305,15 @@ void addBinaryTables(sqlite3* db, std::vector<std::string> filenames){
 
             entries = convertBlock(lines[0]);
 
+            std::string pkey;
+
             std::string sql = "CREATE TABLE " + table_name + "(";
 
             for(unsigned int e = 0; e < entries.size(); ++e){
+                if(entries[e].second.find("PRIMARY KEY") != std::string::npos){
+                    pkey = entries[e].first;
+                }
+
                 std::string diff = entries[e].first + " " + entries[e].second;
                 sql += diff;
                 if(e < entries.size() - 1) sql += ",";
@@ -331,39 +336,40 @@ void addBinaryTables(sqlite3* db, std::vector<std::string> filenames){
 
                 entries = convertBlock(lines[block]);
 
-                std::string insert = "INSERT INTO " + table_name + "(";
-                std::string values = "VALUES(";
+                std::string filename;
+                std::string entry_name;
 
-
-                for(unsigned int e = 0; e < entries.size(); ++e){
-
-                    //the keys are added to insert
-                    insert += wrap(entries[e].first);
-
-                    //the values are added to... values
-                    std::string bname = entries[e].second.substr(0, entries[e].second.find('.'));
-                    values += wrap(bname);
-
-                    //commas or terminators are added as needed
-                    if(e < entries.size() - 1){
-                        insert += ",";
-                        values += ",";
+                //find the entry and file names
+                for(const auto& e : entries){
+                    if(e.first == pkey){
+                        entry_name = e.second;
                     }
-                    else{
-                        insert += ")";
-                        values += ");";
+                    else if(e.first == "FILENAME"){
+                        filename = e.second;
                     }
-
-                    insertBlob(db, "binary/blob/" + entries[e].second, table_name, bname);
                 }
 
-                //combine insert and values for a full sql query
-                sql = insert + values;
+                std::vector<std::string> update;
 
-                rc = sqlite3_exec(db, sql.c_str(), 0, 0, 0);
-                if(rc != SQLITE_OK){
-                    std::cout << "\n\nQUERY FAILED WITH ERROR CODE " << rc << "!\n\t" << sql << '\n';
-                    continue;
+                for(unsigned int e = 0; e < entries.size(); ++e){
+                    if(entries[e].first == "FILENAME"
+                    || entries[e].first == pkey){
+                        continue;
+                    }
+
+                    update.push_back(std::string("UPDATE " + table_name + " SET " + entries[e].first + " = " + wrap(entries[e].second) + " WHERE " + pkey + " = " + wrap(entry_name) + ";"));
+                }
+
+                std::cout << "\ninserting blob from binary/blob/" << filename << " to " << entry_name;
+
+                insertBlob(db, "binary/blob/" + filename, table_name, entry_name, pkey);
+
+                for(const auto& u : update){
+                    rc = sqlite3_exec(db, u.c_str(), 0, 0, 0);
+                    if(rc != SQLITE_OK){
+                        std::cout << "\n\nQUERY FAILED WITH ERROR CODE " << rc << "!\n\t" << u << '\n';
+                        continue;
+                    }
                 }
 
             } //end block loop

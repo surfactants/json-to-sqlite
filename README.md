@@ -13,7 +13,11 @@ The example files are derived from a game, for which I made this program. If you
 
 - Each JSON file must begin with a dummy entry, formatted as `"KEY":"TYPE"`
 - Primary key must be identified in the type string (i.e. `"NAME" : "TEXT PRIMARY KEY NOT NULL"`)
-- Binary JSON files only need one value per entry (`"NAME":"FILENAME"`),
-  - **EXCEPT for the dummy entry**, which also requires `"DATA":"BLOB"`
+- Files describing tables with binary data have additional requirements:
+  - **the dummy entry** requires a `"DATA":"BLOB"` field!
+  - **all regular entries** require a `"FILENAME":"dir/EXAMPLE_NAME"` field!
+  - These files are to be stored in `binary/`.
+  - The data to which they point are to be stored in `binary/blob/`
+    - (subdirectories are always acceptable, just make sure it is recorded in the manifest.)
 - If the filenames from the binary files do not exist
 - One table per json file

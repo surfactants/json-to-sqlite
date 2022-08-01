@@ -5,52 +5,68 @@
 		"DATA":"BLOB"
 	},
 	{
-		"NAME":"textures/BUGS-MELEE_LIGHT.png"
+		"NAME":"BUGS-MELEE_LIGHT"
+		"FILENAME":"textures/BUGS-MELEE_LIGHT.png"
 	},
 	{
-		"NAME":"textures/BUGS-MELEE_HEAVY.png"
+		"NAME":"BUGS-MELEE_HEAVY"
+		"FILENAME":"textures/BUGS-MELEE_HEAVY.png"
 	},
 	{
-		"NAME":"textures/BUGS-RANGED.png"
+		"NAME":"BUGS-RANGED"
+		"FILENAME":"textures/BUGS-RANGED.png"
 	},
 	{
-		"NAME":"textures/BUGS-TURRET.png"
+		"NAME":"BUGS-TURRET"
+		"FILENAME":"textures/BUGS-TURRET.png"
 	},
 	{
-		"NAME":"textures/BUGS-BOSS.png"
+		"NAME":"BUGS-BOSS"
+		"FILENAME":"textures/BUGS-BOSS.png"
 	},
 	{
-		"NAME":"textures/PIRATES-MELEE_LIGHT.png"
+		"NAME":"PIRATES-MELEE_LIGHT"
+		"FILENAME":"textures/PIRATES-MELEE_LIGHT.png"
 	},
 	{
-		"NAME":"textures/PIRATES-MELEE_HEAVY.png"
+		"NAME":"PIRATES-MELEE_HEAVY"
+		"FILENAME":"textures/PIRATES-MELEE_HEAVY.png"
 	},
 	{
-		"NAME":"textures/PIRATES-RANGED.png"
+		"NAME":"PIRATES-RANGED"
+		"FILENAME":"textures/PIRATES-RANGED.png"
 	},
 	{
-		"NAME":"textures/PIRATES-TURRET.png"
+		"NAME":"PIRATES-TURRET"
+		"FILENAME":"textures/PIRATES-TURRET.png"
 	},
 	{
-		"NAME":"textures/PIRATES-BOSS.png"
+		"NAME":"PIRATES-BOSS"
+		"FILENAME":"textures/PIRATES-BOSS.png"
 	},
 	{
-		"NAME":"textures/ROBOTS-MELEE_LIGHT.png"
+		"NAME":"ROBOTS-MELEE_LIGHT"
+		"FILENAME":"textures/ROBOTS-MELEE_LIGHT.png"
 	},
 	{
-		"NAME":"textures/ROBOTS-MELEE_HEAVY.png"
+		"NAME":"ROBOTS-MELEE_HEAVY"
+		"FILENAME":"textures/ROBOTS-MELEE_HEAVY.png"
 	},
 	{
-		"NAME":"textures/ROBOTS-RANGED.png"
+		"NAME":"ROBOTS-RANGED"
+		"FILENAME":"textures/ROBOTS-RANGED.png"
 	},
 	{
-		"NAME":"textures/ROBOTS-TURRET.png"
+		"NAME":"ROBOTS-TURRET"
+		"FILENAME":"textures/ROBOTS-TURRET.png"
 	},
 	{
-		"NAME":"textures/ROBOTS-BOSS.png"
+		"NAME":"ROBOTS-BOSS"
+		"FILENAME":"textures/ROBOTS-BOSS.png"
 	},
 	{
-		"NAME":"textures/PLAYER.png"
+		"NAME":"PLAYER"
+		"FILENAME":"textures/PLAYER.png"
 	}
 ]
 }
