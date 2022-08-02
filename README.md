@@ -16,6 +16,7 @@ The example files are derived from a game, for which I made this program. If you
 - Primary key must be identified in the type string (i.e. `"NAME" : "TEXT PRIMARY KEY NOT NULL"`)
 
 #### Files describing tables with binary data have additional requirements:
+- Only one blob per table
 - **the dummy entry** requires a `"DATA":"BLOB"` field!
 - **all regular entries** require a `"FILENAME":"dir/EXAMPLE_NAME"` field!
 - These files are to be stored in `binary/`.
