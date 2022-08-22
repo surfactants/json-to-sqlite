@@ -46,35 +46,17 @@ int main(){
 
     std::vector<std::string> filenames = extractFilenames("manifest.txt", "data/");
     if(filenames.size() > 0){
-        std::cout << "\nadding standard tables...\n";
+        std::cout << "\nadding tables...\n";
 
         addTables(db, filenames);
 
-        std::cout << "\nstandard tables added!\n";
+        std::cout << "\ntables added!\n";
 
         filenames.clear();
     }
     else{
-        std::cout << "\nno filenames for standard tables were found!";
+        std::cout << "\nno filenames were found! double check manifest.txt in the working directory!";
     }
-
-    filenames = extractFilenames("manifest_binary.txt", "binary/");
-    if(filenames.size() > 0){
-        std::cout << "\nadding binary tables...\n";
-
-        addBinaryTables(db, filenames);
-
-        std::cout << "\nbinary tables added!\n";
-
-        filenames.clear();
-    }
-    else{
-        std::cout << "\nno filenames for binary tables were found!\n";
-    }
-
-    sqlite3_close(db);
-
-    std::cout << "\ndata.db closed!\n";
 
     return 0;
 }

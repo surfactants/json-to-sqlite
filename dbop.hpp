@@ -31,10 +31,8 @@ std::string wrap(std::string str);
 
 void littleBobbyTables(sqlite3* db);
 
-void insertBlob(sqlite3* db, std::string fname, std::string tname, std::string bname, std::string pkey);
+void insertBlob(sqlite3* db, std::string fname, std::string tname, std::string bname, std::string pkey, std::string cname);
 
 void addTables(sqlite3* db, std::vector<std::string> filenames); //adds text tables
-
-void addBinaryTables(sqlite3* db, std::vector<std::string> filenames);
 
 std::vector<std::pair<std::string, std::string>> convertBlock(std::vector<std::string> block);

@@ -1,2 +1,0 @@
-textures.json
-fonts.json

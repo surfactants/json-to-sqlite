@@ -108,11 +108,10 @@ std::vector<std::pair<std::string, std::string>> convertBlock(std::vector<std::s
     return entries;
 }
 
-void insertBlob(sqlite3* db, std::string fname, std::string tname, std::string bname, std::string pkey){
-    std::cout << "inserting " << bname << " to " << tname << '\n';
+void insertBlob(sqlite3* db, std::string fname, std::string tname, std::string bname, std::string pkey, std::string cname){
+    std::cout << "inserting " << bname << "::" << cname << " to " << tname << '\n';
     sqlite3_stmt* stmt;
-    //std::string sql = "UPDATE " + tname " SET "
-    std::string sql = "INSERT INTO " + tname + "('" + pkey + "', DATA) VALUES(?,?)";
+    std::string sql = "UPDATE " + tname + " SET " + cname + " = ? WHERE " + pkey + " = '" + bname + "'";
     int rc;
 
     std::ifstream data(fname, std::ios::in | std::ios::binary);
@@ -126,23 +125,39 @@ void insertBlob(sqlite3* db, std::string fname, std::string tname, std::string b
     char* buffer = new char[size_img];
     data.read(buffer, size_img);
 
+    data.close();
+
     rc = sqlite3_prepare(db, sql.c_str(), -1, &stmt, 0);
     if(rc != SQLITE_OK){
-        std::cout << "unable to prepare " << tname << " statement: " << sqlite3_errmsg(db) << '\n';
+        std::cout << "unable to prepare " << tname << " statement: " << sqlite3_errmsg(db) << "\n\t(" + sql + ")\n";
     }
 
-    sqlite3_bind_text(stmt, 1, bname.c_str(), -1, SQLITE_STATIC);
-    sqlite3_bind_blob(stmt, 2, buffer, size_img, SQLITE_STATIC);
+    sqlite3_bind_blob(stmt, 1, buffer, size_img, SQLITE_STATIC);
 
     rc = sqlite3_step(stmt);
 
     if(rc != SQLITE_DONE){
-        std::cout << "execution of " << bname << " failed: " << sqlite3_errmsg(db) << '\n';
+        std::cout << "execution of " << bname << " failed: " << sqlite3_errmsg(db) << "\n\t(" + sql + ")\n";
     }
 
     sqlite3_finalize(stmt);
 
     delete[] buffer;
+}
+
+char* getBlob(std::string fname){
+    std::ifstream data(fname, std::ios::in | std::ios::binary);
+    if(!data) std::cout << "failed to open " + fname + "...\n";
+
+//determines file size
+    data.seekg(0, std::ifstream::end);
+    int size = data.tellg();
+    data.seekg(0);
+
+    char* blob = new char[size];
+    data.read(blob, size);
+
+    return blob;
 }
 
 void addTables(sqlite3* db, std::vector<std::string> filenames){
@@ -161,7 +176,7 @@ void addTables(sqlite3* db, std::vector<std::string> filenames){
             std::string line;
             std::getline(file, line); //opening brace
 
-            //first we extract the name of the table
+            //extract table name
 
             std::getline(file, line);
             std::string table_name = line.substr(line.find('"') + 1);
@@ -192,6 +207,8 @@ void addTables(sqlite3* db, std::vector<std::string> filenames){
 
             std::vector<std::pair<std::string, std::string>> entries;
 
+            std::vector<std::string> blob_keys;
+
             entries = convertBlock(lines[0]);
 
             std::string sql = "CREATE TABLE " + table_name + "(";
@@ -201,6 +218,10 @@ void addTables(sqlite3* db, std::vector<std::string> filenames){
                 sql += diff;
                 if(e < entries.size() - 1) sql += ",";
                 else sql += ")";
+
+                if(entries[e].second == "BLOB"){
+                    blob_keys.push_back(std::string(entries[e].first));
+                }
 
                 std::cout << "\t\t" << diff << "\n";
             }
@@ -214,6 +235,8 @@ void addTables(sqlite3* db, std::vector<std::string> filenames){
             //the table has been created
                 //we are now ready to begin iterating through and adding the actual entries
             for(unsigned int block = 1; block < lines.size(); ++block){
+                std::vector<std::pair<std::string, std::string>> blobs;
+
                 std::cout << "\tcreating " << lines[block][0] << '\n';
                 entries.clear();
 
@@ -225,11 +248,17 @@ void addTables(sqlite3* db, std::vector<std::string> filenames){
 
                 for(unsigned int e = 0; e < entries.size(); ++e){
 
+
                     //the keys are added to insert
                     insert += wrap(entries[e].first);
 
                     //the values are added to... values
-                    values += wrap(entries[e].second);
+                    if(std::find(blob_keys.begin(), blob_keys.end(), entries[e].first) != blob_keys.end()){
+                        values += "NULL";
+                        entries[e].second = "blob/" + entries[e].second;
+                        blobs.push_back(entries[e]);
+                    }
+                    else values += wrap(entries[e].second);
 
                     //commas or terminators are added as needed
                     if(e < entries.size() - 1){
@@ -251,125 +280,8 @@ void addTables(sqlite3* db, std::vector<std::string> filenames){
                     continue;
                 }
 
-            } //end block loop
-        } //end file opened successfully
-    } //end filename loop
-}
-
-void addBinaryTables(sqlite3* db, std::vector<std::string> filenames){
-    for(const auto& filename : filenames){
-        std::cout << '\n';
-        int rc;
-
-        std::ifstream file;
-        file.open(filename, std::ios::in);
-        if(!file.is_open()){
-            std::cout << "\nfailed to open " << filename << "!\n";
-            continue;
-        }
-        else{ //file opened successfully
-            std::cout << "opened " << filename << "\n";
-            std::string line;
-            std::getline(file, line); //opening brace
-
-            //first we extract the name of the table
-
-            std::getline(file, line);
-            std::string table_name = line.substr(line.find('"') + 1);
-            table_name = table_name.substr(0, table_name.find('"'));
-
-            std::cout << "creating table " << table_name << ", with fields: \n";
-
-            //now read the lines into a vector of string vectors
-                //the second dimension holds each distinct definition
-
-            std::vector<std::vector<std::string>> lines;
-            while(file.good()){
-                std::getline(file, line);
-                if(line.find(']') != std::string::npos){
-                    break;
-                }
-                else if(line.find('{') != std::string::npos){
-                    lines.push_back(std::vector<std::string>());
-                }
-                else if(line.find('}') == std::string::npos){
-                    lines.back().push_back(line.substr(line.find('"')));
-                        //the find operation truncates the prepending whitespace
-                }
-            }
-
-            //now we create the table, using the first entry (which is formatted as "KEY":"TYPE")
-                //make sure you have a primary key included in the type string!
-
-            std::vector<std::pair<std::string, std::string>> entries;
-
-            entries = convertBlock(lines[0]);
-
-            std::string pkey;
-
-            std::string sql = "CREATE TABLE " + table_name + "(";
-
-            for(unsigned int e = 0; e < entries.size(); ++e){
-                if(entries[e].second.find("PRIMARY KEY") != std::string::npos){
-                    pkey = entries[e].first;
-                }
-
-                std::string diff = entries[e].first + " " + entries[e].second;
-                sql += diff;
-                if(e < entries.size() - 1) sql += ",";
-                else sql += ")";
-
-                std::cout << "\t\t" << diff << "\n";
-            }
-
-            rc = sqlite3_exec(db, sql.c_str(), 0, 0, 0);
-            if(rc != SQLITE_OK){
-                std::cout << "FAILED TO CREATE TABLE " << table_name << " WITH ERROR CODE " << rc;
-                continue;
-            }
-
-            //the table has been created
-                //we are now ready to begin iterating through and adding the actual entries
-            for(unsigned int block = 1; block < lines.size(); ++block){
-                std::cout << "\tcreating " << lines[block][0] << '\n';
-                entries.clear();
-
-                entries = convertBlock(lines[block]);
-
-                std::string filename;
-                std::string entry_name;
-
-                //find the entry and file names
-                for(const auto& e : entries){
-                    if(e.first == pkey){
-                        entry_name = e.second;
-                    }
-                    else if(e.first == "FILENAME"){
-                        filename = e.second;
-                    }
-                }
-
-                std::vector<std::string> update;
-
-                for(unsigned int e = 0; e < entries.size(); ++e){
-                    if(entries[e].first == "FILENAME"
-                    || entries[e].first == pkey){
-                        continue;
-                    }
-
-                    update.push_back(std::string("UPDATE " + table_name + " SET " + entries[e].first + " = " + wrap(entries[e].second) + " WHERE " + pkey + " = " + wrap(entry_name) + ";"));
-                }
-
-                std::cout << "\ninserting blob from binary/blob/" << filename << " to " << entry_name;
-
-                insertBlob(db, "binary/blob/" + filename, table_name, entry_name, pkey);
-
-                for(const auto& u : update){
-                    rc = sqlite3_exec(db, u.c_str(), 0, 0, 0);
-                    if(rc != SQLITE_OK){
-                        std::cout << "\n\nQUERY FAILED WITH ERROR CODE " << rc << "!\n\t" << u << '\n';
-                        continue;
-                    }
+                for(const auto& blob : blobs){
+                    insertBlob(db, blob.second, table_name, entries[0].second, entries[0].first, blob.first);
                 }
 
             } //end block loop

@@ -47,3 +47,8 @@
 # git cruft
 .gitattributes
 _resources
+
+# misc
+/binary/
+*.png
+*.ttf

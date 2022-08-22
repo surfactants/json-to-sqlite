@@ -10,7 +10,7 @@
 		"IDLE_COUNT":"INT",
 		"MOVING_COUNT":"INT",
 		"ATTACKING_COUNT":"INT",
-		"DYING_COUNT":"INT"
+		"DYING_COUNT":"INT",
 	},
 	{
 		"NAME":"BUGS-MELEE_LIGHT",
@@ -34,7 +34,7 @@
 		"IDLE_COUNT":"4",
 		"MOVING_COUNT":"4",
 		"ATTACKING_COUNT":"4",
-		"DYING_COUNT":"4"
+		"DYING_COUNT":"4",
 	},
 	{
 		"NAME":"BUGS-RANGED",
@@ -46,7 +46,7 @@
 		"IDLE_COUNT":"4",
 		"MOVING_COUNT":"4",
 		"ATTACKING_COUNT":"4",
-		"DYING_COUNT":"4"
+		"DYING_COUNT":"4",
 	},
 	{
 		"NAME":"BUGS-TURRET",
@@ -58,7 +58,7 @@
 		"IDLE_COUNT":"4",
 		"MOVING_COUNT":"4",
 		"ATTACKING_COUNT":"4",
-		"DYING_COUNT":"4"
+		"DYING_COUNT":"4",
 	},
 	{
 		"NAME":"BUGS-BOSS",
@@ -70,7 +70,7 @@
 		"IDLE_COUNT":"4",
 		"MOVING_COUNT":"4",
 		"ATTACKING_COUNT":"4",
-		"DYING_COUNT":"4"
+		"DYING_COUNT":"4",
 	},
 	{
 		"NAME":"PIRATES-MELEE_LIGHT",
@@ -94,7 +94,7 @@
 		"IDLE_COUNT":"4",
 		"MOVING_COUNT":"4",
 		"ATTACKING_COUNT":"4",
-		"DYING_COUNT":"4"
+		"DYING_COUNT":"4",
 	},
 	{
 		"NAME":"PIRATES-RANGED",
@@ -106,7 +106,7 @@
 		"IDLE_COUNT":"4",
 		"MOVING_COUNT":"4",
 		"ATTACKING_COUNT":"4",
-		"DYING_COUNT":"4"
+		"DYING_COUNT":"4",
 	},
 	{
 		"NAME":"PIRATES-TURRET",
@@ -118,7 +118,7 @@
 		"IDLE_COUNT":"4",
 		"MOVING_COUNT":"4",
 		"ATTACKING_COUNT":"4",
-		"DYING_COUNT":"4"
+		"DYING_COUNT":"4",
 	},
 	{
 		"NAME":"PIRATES-BOSS",
@@ -130,7 +130,7 @@
 		"IDLE_COUNT":"4",
 		"MOVING_COUNT":"4",
 		"ATTACKING_COUNT":"4",
-		"DYING_COUNT":"4"
+		"DYING_COUNT":"4",
 	},
 	{
 		"NAME":"ROBOTS-MELEE_LIGHT",
@@ -142,7 +142,7 @@
 		"IDLE_COUNT":"4",
 		"MOVING_COUNT":"4",
 		"ATTACKING_COUNT":"4",
-		"DYING_COUNT":"4"
+		"DYING_COUNT":"4",
 	},
 	{
 		"NAME":"ROBOTS-MELEE_HEAVY",
@@ -154,7 +154,7 @@
 		"IDLE_COUNT":"4",
 		"MOVING_COUNT":"4",
 		"ATTACKING_COUNT":"4",
-		"DYING_COUNT":"4"
+		"DYING_COUNT":"4",
 	},
 	{
 		"NAME":"ROBOTS-RANGED",
@@ -166,7 +166,7 @@
 		"IDLE_COUNT":"4",
 		"MOVING_COUNT":"4",
 		"ATTACKING_COUNT":"4",
-		"DYING_COUNT":"4"
+		"DYING_COUNT":"4",
 	},
 	{
 		"NAME":"ROBOTS-TURRET",
@@ -178,7 +178,7 @@
 		"IDLE_COUNT":"4",
 		"MOVING_COUNT":"4",
 		"ATTACKING_COUNT":"4",
-		"DYING_COUNT":"4"
+		"DYING_COUNT":"4",
 	},
 	{
 		"NAME":"ROBOTS-BOSS",
@@ -190,7 +190,7 @@
 		"IDLE_COUNT":"4",
 		"MOVING_COUNT":"4",
 		"ATTACKING_COUNT":"4",
-		"DYING_COUNT":"4"
+		"DYING_COUNT":"4",
 	},
 	{
 		"NAME":"PLAYER",
@@ -202,7 +202,7 @@
 		"IDLE_COUNT":"4",
 		"MOVING_COUNT":"4",
 		"ATTACKING_COUNT":"4",
-		"DYING_COUNT":"4"
+		"DYING_COUNT":"4",
 	}
 ]
 }
