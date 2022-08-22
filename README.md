@@ -13,4 +13,4 @@ Simply add your JSON files to `data/` and record them in `manifest.txt`.
 - Each JSON file must begin with a dummy entry, formatted as `"KEY":"TYPE"` (i.e. `"COUNT":"INT"`)
 - Primary key must be identified in the type string (i.e. `"NAME" : "TEXT PRIMARY KEY NOT NULL"`)
 - BLOB fields require a filename, including any subdirectories, for the value
-	- *the filename must exist*, in `blob/` or the program will undergo rapid unplanned disassembly!
+	- *the reffered file must exist in `blob/` or the program will undergo rapid unplanned disassembly!*
