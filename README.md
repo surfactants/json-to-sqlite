@@ -5,7 +5,7 @@ Written with the SQLite 3.38.0 amalgamation [(direct download)](https://www.sqli
 
 ## to use
 
-Simply add your JSON files to `data/` and record them in `manifest.txt`.
+Simply add your JSON files to `data/`, and record them in `manifest.txt`. Binary files go in `blob/`.
 
 ## notes
 
