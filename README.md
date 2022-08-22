@@ -13,4 +13,8 @@ Simply add your JSON files to `data/` and record them in `manifest.txt`.
 - Each JSON file must begin with a dummy entry, formatted as `"KEY":"TYPE"` (i.e. `"COUNT":"INT"`)
 - Primary key must be identified in the type string (i.e. `"NAME" : "TEXT PRIMARY KEY NOT NULL"`)
 - BLOB fields require a filename, including any subdirectories, for the value
-	- *the reffered file must exist in `blob/` or the program will undergo rapid unplanned disassembly!*
+	- *the referred file must exist in `blob/` or the program will undergo rapid unplanned disassembly!*
+
+Here is the example data as seen in `DB Browser for SQLite`:
+
+![a screenshot from DB Browser, showing a single entry in a BOOKS table which matches the data found in example.json](https://github.com/surfactants/json-to-sqlite/blob/main/database.png)
