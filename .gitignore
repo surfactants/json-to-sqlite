@@ -42,7 +42,6 @@
 
 # SQLite files
 /sqlite/
-*.db
 
 # git cruft
 .gitattributes
