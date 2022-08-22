@@ -228,7 +228,7 @@ void addTables(sqlite3* db, std::vector<std::string> filenames){
 
             rc = sqlite3_exec(db, sql.c_str(), 0, 0, 0);
             if(rc != SQLITE_OK){
-                std::cout << "FAILED TO CREATE TABLE " << table_name << " WITH ERROR CODE " << rc;
+                std::cout << "FAILED TO CREATE TABLE " << table_name << " WITH ERROR CODE " << rc << "\n\t" << sql;
                 continue;
             }
 

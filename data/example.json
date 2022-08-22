@@ -1,0 +1,22 @@
+{
+"BOOKS":[
+	{
+		"ISBN":"INT PRIMARY KEY NOT NULL",
+		"TITLE":"TEXT",
+		"AUTHOR":"TEXT",
+		"YEAR":"INT",
+		"COST":"REAL",
+		"COVER":"BLOB",
+		"AUTHORPHOTO":"BLOB"
+	},
+	{
+		"ISBN":"0321563840",
+		"TITLE":"The C++ Programming Language",
+		"AUTHOR":"Bjarne Stroustrup",
+		"YEAR":"2013",
+		"COST":"79.99",
+		"COVER":"covers/The_C++_Programming_Language,_Fourth_Edition.jpg",
+		"AUTHORPHOTO":"authors/bjarne.jpg"
+	}
+]
+}

@@ -1,4 +1,1 @@
-entities.json
-volume.json
-textures.json
-fonts.json
+example.json
