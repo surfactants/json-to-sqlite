@@ -11,8 +11,8 @@ Simply add your JSON files to `data/` and record them in `manifest.txt`.
 
 - Each table must be defined in its own JSON file.
 - Each JSON file must begin with a dummy entry, formatted as `"KEY":"TYPE"` (i.e. `"COUNT":"INT"`)
-- Primary key must be identified in the type string (i.e. `"NAME" : "TEXT PRIMARY KEY NOT NULL"`)
-- BLOB fields require a filename, including any subdirectories, for the value
+- Primary key must be identified in the type string (i.e. `"NAME":"TEXT PRIMARY KEY NOT NULL"`)
+- BLOB fields require a filename, including any subdirectories, for the value (i.e. `"DATA":"images/img.jpg"`)
 	- *the referred file must exist in `blob/` or the program will undergo rapid unplanned disassembly!*
 
 Here is the example data as seen in `DB Browser for SQLite`:
