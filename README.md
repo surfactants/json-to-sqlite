@@ -15,6 +15,6 @@ Simply add your JSON files to `data/`, and record them in `manifest.txt`. Binary
 - BLOB fields require a filename, including any subdirectories, for the value (i.e. `"DATA":"images/img.jpg"`)
 	- *the referred file must exist in `blob/` or the program will undergo rapid unplanned disassembly!*
 
-Here is the example data as seen in `DB Browser for SQLite`:
+Here is the packed example data, seen in `DB Browser for SQLite`:
 
 ![a screenshot from DB Browser, showing a single entry in a BOOKS table which matches the data found in example.json](https://github.com/surfactants/json-to-sqlite/blob/main/database.png)
