@@ -33,7 +33,6 @@
 
 # Output
 /bin/
-/binary/blob/*
 
 # Code::Blocks project files
 *.cbp
@@ -42,12 +41,8 @@
 
 # SQLite files
 /sqlite/
+*.db
 
 # git cruft
 .gitattributes
 _resources
-
-# misc
-/binary/
-*.png
-*.ttf
