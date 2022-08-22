@@ -108,14 +108,14 @@ std::vector<std::pair<std::string, std::string>> convertBlock(std::vector<std::s
     return entries;
 }
 
-void insertBlob(sqlite3* db, std::string fname, std::string tname, std::string bname, std::string pkey, std::string cname){
-    std::cout << "inserting " << bname << "::" << cname << " to " << tname << '\n';
+void insertBlob(sqlite3* db, std::string file_name, std::string table_name, std::string entry_name, std::string primary_key, std::string column_name){
+    std::cout << "inserting " << entry_name << "::" << column_name << " to " << table_name << '\n';
     sqlite3_stmt* stmt;
-    std::string sql = "UPDATE " + tname + " SET " + cname + " = ? WHERE " + pkey + " = '" + bname + "'";
+    std::string sql = "UPDATE " + table_name + " SET " + column_name + " = ? WHERE " + primary_key + " = '" + entry_name + "'";
     int rc;
 
-    std::ifstream data(fname, std::ios::in | std::ios::binary);
-    if(!data) std::cout << "failed to open " + fname + "...\n";
+    std::ifstream data(file_name, std::ios::in | std::ios::binary);
+    if(!data) std::cout << "failed to open " + file_name + "...\n";
 
 //determines file size
     data.seekg(0, std::ifstream::end);
@@ -129,7 +129,7 @@ void insertBlob(sqlite3* db, std::string fname, std::string tname, std::string b
 
     rc = sqlite3_prepare(db, sql.c_str(), -1, &stmt, 0);
     if(rc != SQLITE_OK){
-        std::cout << "unable to prepare " << tname << " statement: " << sqlite3_errmsg(db) << "\n\t(" + sql + ")\n";
+        std::cout << "unable to prepare " << table_name << " statement: " << sqlite3_errmsg(db) << "\n\t(" + sql + ")\n";
     }
 
     sqlite3_bind_blob(stmt, 1, buffer, size_img, SQLITE_STATIC);
@@ -137,27 +137,12 @@ void insertBlob(sqlite3* db, std::string fname, std::string tname, std::string b
     rc = sqlite3_step(stmt);
 
     if(rc != SQLITE_DONE){
-        std::cout << "execution of " << bname << " failed: " << sqlite3_errmsg(db) << "\n\t(" + sql + ")\n";
+        std::cout << "execution of " << entry_name << " failed: " << sqlite3_errmsg(db) << "\n\t(" + sql + ")\n";
     }
 
     sqlite3_finalize(stmt);
 
     delete[] buffer;
-}
-
-char* getBlob(std::string fname){
-    std::ifstream data(fname, std::ios::in | std::ios::binary);
-    if(!data) std::cout << "failed to open " + fname + "...\n";
-
-//determines file size
-    data.seekg(0, std::ifstream::end);
-    int size = data.tellg();
-    data.seekg(0);
-
-    char* blob = new char[size];
-    data.read(blob, size);
-
-    return blob;
 }
 
 void addTables(sqlite3* db, std::vector<std::string> filenames){
