@@ -10,9 +10,9 @@ Simply add your JSON files to `data/`, and record them in `manifest.txt`. Binary
 Results will be saved to `data.db`
 
 The manifest filename, JSON subdirectory, and output filename can all be specified with passed args:
-	- `-m:manifest.txt`
-	- `-p:json_directory/` (the trailing slash will be appended if missing)
-	- `-d:database_name.db` (the file extension will be appended if missing)
+- `-m:manifest.txt`
+- `-p:json_directory/` (the trailing slash will be appended if missing)
+- `-d:database_name.db` (the file extension will be appended if missing)
 
 ## notes
 
