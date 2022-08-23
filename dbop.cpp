@@ -26,6 +26,13 @@
 #include <utility>
 #include <iostream>
 
+std::string extractArg(std::string arg){
+    std::cout << "\nparsing arg: " << arg << '\n';
+    arg = arg.substr(arg.find(":") + 1);
+    std::cout << "\nparsed arg: " << arg << '\n';
+    return arg;
+}
+
 std::vector<std::string> extractFilenames(std::string manifest_name, std::string prefix){
     std::vector<std::string> filenames;
 
@@ -50,29 +57,6 @@ std::vector<std::string> extractFilenames(std::string manifest_name, std::string
     }
 
     return filenames;
-}
-
-std::string wrap(std::string str){
-    return std::string ("'" + str + "'");
-}
-
-void littleBobbyTables(sqlite3* db){
-    int rc;
-    rc = sqlite3_db_config(db, SQLITE_DBCONFIG_RESET_DATABASE, 1, 0);
-    if(rc != SQLITE_OK){
-        std::cout << "config failed on step 1! aborting...";
-        std::abort();
-    }
-    rc = sqlite3_exec(db, "VACUUM", 0, 0, 0);
-    if(rc != SQLITE_OK){
-        std::cout << "config failed on step 2! aborting...";
-        std::abort();
-    }
-    rc = sqlite3_db_config(db, SQLITE_DBCONFIG_RESET_DATABASE, 0, 0);
-    if(rc != SQLITE_OK){
-        std::cout << "config failed on step 3! aborting...";
-        std::abort();
-    }
 }
 
 std::vector<std::pair<std::string, std::string>> convertBlock(std::vector<std::string> block){
@@ -106,6 +90,29 @@ std::vector<std::pair<std::string, std::string>> convertBlock(std::vector<std::s
     }
 
     return entries;
+}
+
+std::string wrap(std::string str){
+    return std::string ("'" + str + "'");
+}
+
+void littleBobbyTables(sqlite3* db){
+    int rc;
+    rc = sqlite3_db_config(db, SQLITE_DBCONFIG_RESET_DATABASE, 1, 0);
+    if(rc != SQLITE_OK){
+        std::cout << "config failed on step 1! aborting...";
+        std::abort();
+    }
+    rc = sqlite3_exec(db, "VACUUM", 0, 0, 0);
+    if(rc != SQLITE_OK){
+        std::cout << "config failed on step 2! aborting...";
+        std::abort();
+    }
+    rc = sqlite3_db_config(db, SQLITE_DBCONFIG_RESET_DATABASE, 0, 0);
+    if(rc != SQLITE_OK){
+        std::cout << "config failed on step 3! aborting...";
+        std::abort();
+    }
 }
 
 void insertBlob(sqlite3* db, std::string file_name, std::string table_name, std::string entry_name, std::string primary_key, std::string column_name){
@@ -261,12 +268,12 @@ void addTables(sqlite3* db, std::vector<std::string> filenames){
 
                 rc = sqlite3_exec(db, sql.c_str(), 0, 0, 0);
                 if(rc != SQLITE_OK){
-                    std::cout << "\n\nQUERY FAILED WITH ERROR CODE " << rc << "!\n\t" << sql << '\n';
+                    std::cout << "\n\nQUERY FAILED WITH ERROR CODE " << rc << ":\n\t" << sql << '\n';
                     continue;
                 }
 
                 for(const auto& blob : blobs){
-                    insertBlob(db, blob.second, table_name, entries[0].second, entries[0].first, blob.first);
+                    insertBlob(db, blob.second, table_name, entries[0].first, entries[0].second, blob.first);
                 }
 
             } //end block loop

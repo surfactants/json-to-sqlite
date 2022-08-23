@@ -23,20 +23,44 @@
 #include <fstream>
 #include <iostream>
 
-int main(){
+int main(int argc, char* argv[]){
+    //define names for the manifest file and the json subdirectory
+    std::string manifest_name = "manifest.txt",
+                     prefix = "data/",
+                     database_name = "data.db";
+
+    //parse args to change manifest_name and prefix
+    for(int c = 1; c < argc; c++){
+        std::string arg(argv[c]);
+
+        if(arg.length() < 2) continue;
+
+        if(arg[1] == 'm'){
+            manifest_name = extractArg(arg);
+        }
+        else if(arg[1] == 'p'){
+            prefix = extractArg(arg);
+            if(prefix.back() != '/') prefix += '/';
+        }
+        else if(arg[1] == 'd'){
+            database_name = extractArg(arg);
+            if(database_name.find(".db") == std::string::npos) database_name += ".db";
+        }
+    }
+
     //initialize and open the database
     sqlite3* db;
-    int rc = sqlite3_open("data.db", &db);
+    int rc = sqlite3_open(database_name.c_str(), &db);
 
     //if the database fails to open for whatever reason,
-        //attempt to close it and return error code 2
-    if(rc){
+        //attempt to close it and return error code 1
+    if(rc != SQLITE_OK){
         std::cout << "failed to open database, error " << sqlite3_errmsg(db) << '\n';
         sqlite3_close(db);
         return 1;
     }
 
-    std::cout << "data.db successfully opened!\n";
+    std::cout << database_name << " successfully opened!\n";
 
     //extract the filenames from manifest.txt
 
@@ -44,15 +68,14 @@ int main(){
 
     littleBobbyTables(db);
 
-    std::vector<std::string> filenames = extractFilenames("manifest.txt", "data/");
+    std::vector<std::string> filenames = extractFilenames(manifest_name, prefix);
+
     if(filenames.size() > 0){
         std::cout << "\nadding tables...\n";
 
         addTables(db, filenames);
 
         std::cout << "\ntables added!\n";
-
-        filenames.clear();
     }
     else{
         std::cout << "\nno filenames were found! double check manifest.txt in the working directory!";

@@ -7,6 +7,13 @@ Written with the SQLite 3.38.0 amalgamation [(direct download)](https://www.sqli
 
 Simply add your JSON files to `data/`, and record them in `manifest.txt`. Binary files go in `blob/`.
 
+Results will be saved to `data.db`
+
+The manifest filename, JSON subdirectory, and output filename can all be specified with passed args:
+	- `-m:manifest.txt`
+	- `-p:json_directory/` (the trailing slash will be appended if missing)
+	- `-d:database_name.db` (the file extension will be appended if missing)
+
 ## notes
 
 - Each table must be defined in its own JSON file.
