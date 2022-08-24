@@ -39,7 +39,7 @@ std::vector<std::string> extractFilenames(std::string manifest_name, std::string
     std::ifstream manifest;
     manifest.open(manifest_name, std::ios::in);
 
-    //if the file fails to open, return empty vector
+//if the file fails to open, return empty vector
     if(!manifest.is_open()){
         std::cout << "failed to open " << manifest_name << "!\n";
         return std::vector<std::string>();
@@ -59,11 +59,53 @@ std::vector<std::string> extractFilenames(std::string manifest_name, std::string
     return filenames;
 }
 
-std::vector<std::pair<std::string, std::string>> convertBlock(std::vector<std::string> block){
-    std::vector<std::pair<std::string, std::string>> entries;
+Blocks getBlocks(std::string filename, std::string& table_name){
+    Blocks blocks;
 
-    //define lambdas for extraction operations
+    std::ifstream file;
+    file.open(filename, std::ios::in);
+    if(!file.is_open()){
+        std::cout << "\nfailed to open " << filename << "!\n";
+        return blocks;
+    }
 
+    std::cout << "opened " << filename << "\n";
+    std::string line;
+    std::getline(file, line); //opening brace
+
+//extract table name
+    std::getline(file, line);
+    table_name = line.substr(line.find('"') + 1);
+    table_name = table_name.substr(0, table_name.find('"'));
+
+    std::cout << "creating table " << table_name << ", with fields: \n";
+
+//read the blocks. each represents one table.
+    while(file.good()){
+        std::getline(file, line);
+        if(line.find(']') != std::string::npos){
+            break;
+        }
+        else if(line.find('{') != std::string::npos){
+            blocks.push_back(std::vector<std::string>());
+        }
+        else if(line.find('}') == std::string::npos){
+            blocks.back().push_back(line.substr(line.find('"')));
+                //the find operation truncates the prepending whitespace
+        }
+    }
+
+    file.close();
+
+    std::cout << "\tblocks read!\n\n";
+
+    return blocks;
+}
+
+Entry_Data convertBlock(std::vector<std::string> block){
+    Entry_Data entries;
+
+//define lambdas for extraction operations
     auto trunc = [] (std::string& s){
         s = s.substr(s.find('"') + 1);
     };
@@ -73,20 +115,21 @@ std::vector<std::pair<std::string, std::string>> convertBlock(std::vector<std::s
     };
 
 
-    //split each line into key/value pairs and add them to the vector
-
+//split each line into key/value pairs and add them to the vector
     for(auto line : block){
-        std::string k,
-                    v;
+        std::string key,
+                    val;
 
+    //remove the first quote and extract the key
         trunc(line);
+        key = extract(line);
 
-        k = extract(line);
+    //remove the key and extract the value
         trunc(line);
         trunc(line);
-        v = extract(line);
+        val = extract(line);
 
-        entries.push_back(std::make_pair(k, v));
+        entries.push_back(std::make_pair(key, val));
     }
 
     return entries;
@@ -115,16 +158,23 @@ void littleBobbyTables(sqlite3* db){
     }
 }
 
-void insertBlob(sqlite3* db, std::string file_name, std::string table_name, std::string entry_name, std::string primary_key, std::string column_name){
-    std::cout << "inserting " << entry_name << "::" << column_name << " to " << table_name << '\n';
+void insertBlob(sqlite3* db, std::string filename, std::string table_name, std::string entry_name, std::string primary_key, std::string column_name){
+    std::cout << "\t\tinserting " << table_name << "::" << column_name << " for entry " << primary_key
+              << "\n\t\t\t(" << filename << ")\n";
+
     sqlite3_stmt* stmt;
+
     std::string sql = "UPDATE " + table_name + " SET " + column_name + " = ? WHERE " + primary_key + " = '" + entry_name + "'";
+
     int rc;
 
-    std::ifstream data(file_name, std::ios::in | std::ios::binary);
-    if(!data) std::cout << "failed to open " + file_name + "...\n";
+    std::ifstream data(filename, std::ios::in | std::ios::binary);
+    if(!data){
+        std::cout << "\t\t\tfailed to open " + filename + "...\n";
+        return;
+    }
 
-//determines file size
+//get file size
     data.seekg(0, std::ifstream::end);
     int size_img = data.tellg();
     data.seekg(0);
@@ -136,20 +186,25 @@ void insertBlob(sqlite3* db, std::string file_name, std::string table_name, std:
 
     rc = sqlite3_prepare(db, sql.c_str(), -1, &stmt, 0);
     if(rc != SQLITE_OK){
-        std::cout << "unable to prepare " << table_name << " statement: " << sqlite3_errmsg(db) << "\n\t(" + sql + ")\n";
+        std::cout << "\t\t\t\tunable to prepare " << table_name << " statement: " << sqlite3_errmsg(db) << "\n\t(" + sql + ")\n";
     }
 
-    sqlite3_bind_blob(stmt, 1, buffer, size_img, SQLITE_STATIC);
+    rc = sqlite3_bind_blob(stmt, 1, buffer, size_img, SQLITE_STATIC);
+    if(rc != SQLITE_OK){
+        std::cout << "\t\t\t\tfailed to bind blob!\n";
+    }
 
     rc = sqlite3_step(stmt);
 
     if(rc != SQLITE_DONE){
-        std::cout << "execution of " << entry_name << " failed: " << sqlite3_errmsg(db) << "\n\t(" + sql + ")\n";
+        std::cout << "\t\t\t\tblob insertion failed: " << sqlite3_errmsg(db) << "\n\t(" + sql + ")\n";
     }
 
     sqlite3_finalize(stmt);
 
     delete[] buffer;
+
+    std::cout << "\t\tblob successfully inserted!\n\n";
 }
 
 void addTables(sqlite3* db, std::vector<std::string> filenames){
@@ -157,126 +212,99 @@ void addTables(sqlite3* db, std::vector<std::string> filenames){
         std::cout << '\n';
         int rc;
 
-        std::ifstream file;
-        file.open(filename, std::ios::in);
-        if(!file.is_open()){
-            std::cout << "\nfailed to open " << filename << "!\n";
+        std::string table_name;
+
+        Blocks blocks = getBlocks(filename, table_name);
+
+    //if the blocks are empty, warn the user and move to the next table
+        if(blocks.size() == 0){
+            std::cout << "\nno data was found in " << filename << "! skipping...";
             continue;
         }
-        else{ //file opened successfully
-            std::cout << "opened " << filename << "\n";
-            std::string line;
-            std::getline(file, line); //opening brace
 
-            //extract table name
+//create the table
+    //convert the first block to a set of entry strings
+        Entry_Data entries;
+        entries = convertBlock(blocks[0]);
 
-            std::getline(file, line);
-            std::string table_name = line.substr(line.find('"') + 1);
-            table_name = table_name.substr(0, table_name.find('"'));
+    //set up an additional vector for blob keys so they may be properly inserted
+        std::vector<std::string> blob_keys;
 
-            std::cout << "creating table " << table_name << ", with fields: \n";
+    //create the initial sql query
+        std::string sql = "CREATE TABLE " + table_name + "(";
 
-            //now read the lines into a vector of string vectors
-                //the second dimension holds each distinct definition
+        //iterate through the entries to extract key/value pairs for the table
+        for(unsigned int e = 0; e < entries.size(); ++e){
+            std::string diff = entries[e].first + " " + entries[e].second;
+            sql += diff;
+            if(e < entries.size() - 1) sql += ",";
+            else sql += ")";
 
-            std::vector<std::vector<std::string>> lines;
-            while(file.good()){
-                std::getline(file, line);
-                if(line.find(']') != std::string::npos){
-                    break;
-                }
-                else if(line.find('{') != std::string::npos){
-                    lines.push_back(std::vector<std::string>());
-                }
-                else if(line.find('}') == std::string::npos){
-                    lines.back().push_back(line.substr(line.find('"')));
-                        //the find operation truncates the prepending whitespace
-                }
+            if(entries[e].second == "BLOB"){
+                blob_keys.push_back(std::string(entries[e].first));
             }
 
-            //now we create the table, using the first entry (which is formatted as "KEY":"TYPE")
-                //make sure you have a primary key included in the type string!
+            std::cout << "\t" << diff << "\n";
+        }
 
-            std::vector<std::pair<std::string, std::string>> entries;
+        std::cout << '\n';
 
-            std::vector<std::string> blob_keys;
+        rc = sqlite3_exec(db, sql.c_str(), 0, 0, 0);
+        if(rc != SQLITE_OK){
+            std::cout << "\t\tFAILED TO CREATE TABLE " << table_name << " WITH ERROR CODE " << rc << "\n\t" << sql;
+            continue;
+        }
 
-            entries = convertBlock(lines[0]);
+//create the entries
+        for(unsigned int block = 1; block < blocks.size(); ++block){
+            Entry_Data blobs;
 
-            std::string sql = "CREATE TABLE " + table_name + "(";
+            std::cout << "\tcreating entry " << blocks[block][0] << '\n';
+            entries.clear();
+
+            entries = convertBlock(blocks[block]);
+
+            std::string insert = "INSERT INTO " + table_name + "(";
+            std::string values = "VALUES(";
+
 
             for(unsigned int e = 0; e < entries.size(); ++e){
-                std::string diff = entries[e].first + " " + entries[e].second;
-                sql += diff;
-                if(e < entries.size() - 1) sql += ",";
-                else sql += ")";
 
-                if(entries[e].second == "BLOB"){
-                    blob_keys.push_back(std::string(entries[e].first));
+            //add key
+                insert += wrap(entries[e].first);
+
+            //add value
+                if(std::find(blob_keys.begin(), blob_keys.end(), entries[e].first) != blob_keys.end()){
+                    values += "NULL";
+                    entries[e].second = "blob/" + entries[e].second;
+                    blobs.push_back(entries[e]);
                 }
+                else values += wrap(entries[e].second);
 
-                std::cout << "\t\t" << diff << "\n";
+            //add commas or terminator as needed
+                if(e < entries.size() - 1){
+                    insert += ",";
+                    values += ",";
+                }
+                else{
+                    insert += ")";
+                    values += ");";
+                }
             }
+
+        //combine insert and values for a full sql query
+            sql = insert + values;
 
             rc = sqlite3_exec(db, sql.c_str(), 0, 0, 0);
             if(rc != SQLITE_OK){
-                std::cout << "FAILED TO CREATE TABLE " << table_name << " WITH ERROR CODE " << rc << "\n\t" << sql;
+                std::cout << "\n\nQUERY FAILED WITH ERROR CODE " << rc << ":\n\t" << sql << '\n';
                 continue;
             }
 
-            //the table has been created
-                //we are now ready to begin iterating through and adding the actual entries
-            for(unsigned int block = 1; block < lines.size(); ++block){
-                std::vector<std::pair<std::string, std::string>> blobs;
+            for(const auto& blob : blobs){
+                insertBlob(db, blob.second, table_name, entries[0].second, entries[0].first, blob.first);
+            }
 
-                std::cout << "\tcreating " << lines[block][0] << '\n';
-                entries.clear();
-
-                entries = convertBlock(lines[block]);
-
-                std::string insert = "INSERT INTO " + table_name + "(";
-                std::string values = "VALUES(";
-
-
-                for(unsigned int e = 0; e < entries.size(); ++e){
-
-
-                    //the keys are added to insert
-                    insert += wrap(entries[e].first);
-
-                    //the values are added to... values
-                    if(std::find(blob_keys.begin(), blob_keys.end(), entries[e].first) != blob_keys.end()){
-                        values += "NULL";
-                        entries[e].second = "blob/" + entries[e].second;
-                        blobs.push_back(entries[e]);
-                    }
-                    else values += wrap(entries[e].second);
-
-                    //commas or terminators are added as needed
-                    if(e < entries.size() - 1){
-                        insert += ",";
-                        values += ",";
-                    }
-                    else{
-                        insert += ")";
-                        values += ");";
-                    }
-                }
-
-                //combine insert and values for a full sql query
-                sql = insert + values;
-
-                rc = sqlite3_exec(db, sql.c_str(), 0, 0, 0);
-                if(rc != SQLITE_OK){
-                    std::cout << "\n\nQUERY FAILED WITH ERROR CODE " << rc << ":\n\t" << sql << '\n';
-                    continue;
-                }
-
-                for(const auto& blob : blobs){
-                    insertBlob(db, blob.second, table_name, entries[0].first, entries[0].second, blob.first);
-                }
-
-            } //end block loop
-        } //end file opened successfully
+        } //end block loop
     } //end filename loop
 }
