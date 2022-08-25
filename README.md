@@ -24,4 +24,4 @@ The manifest filename, JSON subdirectory, and output filename can all be specifi
 
 Here is the packed example data, seen in `DB Browser for SQLite`:
 
-![a screenshot from DB Browser, showing a single entry in a BOOKS table which matches the data found in example.json](https://github.com/surfactants/json-to-sqlite/blob/main/database.png)
+![a screenshot from DB Browser, showing a single entry in a BOOKS table which matches the data found in example.json](https://github.com/surfactants/json-to-sqlite/blob/main/example.png)
