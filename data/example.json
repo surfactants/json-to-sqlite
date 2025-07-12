@@ -35,6 +35,15 @@
 		"COST":"13.99",
 		"COVER":"covers/invis.png",
 		"AUTHORPHOTO":"authors/ellison.png"
+	},
+	{
+		"ISBN":"9780679601395",
+		"TITLE":"Test",
+		"AUTHOR":"Test",
+		"YEAR":"1952",
+		"COST":"13.99",
+		"COVER":"covers/invis.png",
+		"AUTHORPHOTO":"authors/ellison.png"
 	}
 ]
 }

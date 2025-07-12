@@ -20,51 +20,55 @@
 ////////////////////////////////////////////////////////////
 
 #include <dbop.hpp>
+
+#include <experimental/filesystem>
 #include <fstream>
 #include <string>
 #include <vector>
 #include <utility>
 #include <iostream>
 
-std::string extractArg(std::string arg){
+namespace filesystem = std::experimental::filesystem::v1;
+
+std::function<void(Error)> Export::getError;
+
+void err(const std::string& table, const std::string& operation, const std::string& reason)
+{
+
+    Export::getError({ table, operation, reason });
+}
+
+std::string extractArg(std::string arg)
+{
     std::cout << "\nparsing arg: " << arg << '\n';
     arg = arg.substr(arg.find(":") + 1);
     std::cout << "\nparsed arg: " << arg << '\n';
     return arg;
 }
 
-std::vector<std::string> extractFilenames(std::string manifest_name, std::string prefix){
+std::vector<std::string> extractFilenames(std::string prefix)
+{
     std::vector<std::string> filenames;
 
-    std::ifstream manifest;
-    manifest.open(manifest_name, std::ios::in);
+    std::string path = filesystem::current_path().string() + "/" + prefix;
 
-//if the file fails to open, return empty vector
-    if(!manifest.is_open()){
-        std::cout << "failed to open " << manifest_name << "!\n";
-        return std::vector<std::string>();
-    }
-
-    std::cout << "\nextracting filenames from " << prefix << manifest_name << ":\n";
-
-    while(manifest.good()){
-        std::string filename;
-        std::getline(manifest, filename);
-        if(filename != ""){
-            filenames.push_back(prefix + filename);
-            std::cout << '\t' << filenames.back() << '\n';
+    for (const auto& entry : filesystem::directory_iterator(path)) {
+        auto path = entry.path();
+        if (path.extension() == ".json") {
+            filenames.push_back(path.string());
         }
     }
 
     return filenames;
 }
 
-Blocks getBlocks(std::string filename, std::string& table_name){
+Blocks getBlocks(std::string filename, std::string& table_name)
+{
     Blocks blocks;
 
     std::ifstream file;
     file.open(filename, std::ios::in);
-    if(!file.is_open()){
+    if(!file.is_open()) {
         std::cout << "\nfailed to open " << filename << "!\n";
         return blocks;
     }
@@ -81,15 +85,15 @@ Blocks getBlocks(std::string filename, std::string& table_name){
     std::cout << "creating table " << table_name << ", with fields: \n";
 
 //read the blocks. each represents one table.
-    while(file.good()){
+    while(file.good()) {
         std::getline(file, line);
-        if(line.find(']') != std::string::npos){
+        if(line.find(']') != std::string::npos) {
             break;
         }
-        else if(line.find('{') != std::string::npos){
+        else if(line.find('{') != std::string::npos) {
             blocks.push_back(std::vector<std::string>());
         }
-        else if(line.find('}') == std::string::npos){
+        else if(line.find('}') == std::string::npos) {
             blocks.back().push_back(line.substr(line.find('"')));
                 //the find operation truncates the prepending whitespace
         }
@@ -102,21 +106,22 @@ Blocks getBlocks(std::string filename, std::string& table_name){
     return blocks;
 }
 
-Entry_Data convertBlock(std::vector<std::string> block){
+Entry_Data convertBlock(std::vector<std::string> block)
+{
     Entry_Data entries;
 
 //define lambdas for extraction operations
-    auto trunc = [] (std::string& s){
+    auto trunc = [] (std::string& s) {
         s = s.substr(s.find('"') + 1);
     };
 
-    auto extract = [] (std::string& s){
+    auto extract = [] (std::string& s) {
         return s.substr(0, s.find('"'));
     };
 
 
 //split each line into key/value pairs and add them to the vector
-    for(auto line : block){
+    for(auto line : block) {
         std::string key,
                     val;
 
@@ -135,30 +140,33 @@ Entry_Data convertBlock(std::vector<std::string> block){
     return entries;
 }
 
-std::string wrap(std::string str){
+std::string wrap(std::string str)
+{
     return std::string ("'" + str + "'");
 }
 
-void littleBobbyTables(sqlite3* db){
+void littleBobbyTables(sqlite3* db)
+{
     int rc;
     rc = sqlite3_db_config(db, SQLITE_DBCONFIG_RESET_DATABASE, 1, 0);
-    if(rc != SQLITE_OK){
-        std::cout << "config failed on step 1! aborting...";
+    if(rc != SQLITE_OK) {
+        err("null", "CONFIG STEP 1", std::string("ERROR CODE " + std::to_string(rc)));
         std::abort();
     }
     rc = sqlite3_exec(db, "VACUUM", 0, 0, 0);
-    if(rc != SQLITE_OK){
-        std::cout << "config failed on step 2! aborting...";
+    if(rc != SQLITE_OK) {
+        err("null", "CONFIG STEP 2", std::string("ERROR CODE " + std::to_string(rc)));
         std::abort();
     }
     rc = sqlite3_db_config(db, SQLITE_DBCONFIG_RESET_DATABASE, 0, 0);
-    if(rc != SQLITE_OK){
-        std::cout << "config failed on step 3! aborting...";
+    if(rc != SQLITE_OK) {
+        err("null", "CONFIG STEP 3", std::string("ERROR CODE " + std::to_string(rc)));
         std::abort();
     }
 }
 
-void insertBlob(sqlite3* db, std::string filename, std::string table_name, std::string entry_name, std::string primary_key, std::string column_name){
+void insertBlob(sqlite3* db, std::string filename, std::string table_name, std::string entry_name, std::string primary_key, std::string column_name)
+{
     std::cout << "\t\tinserting " << table_name << "::" << column_name << " for entry " << primary_key
               << "\n\t\t\t(" << filename << ")\n";
 
@@ -169,7 +177,7 @@ void insertBlob(sqlite3* db, std::string filename, std::string table_name, std::
     int rc;
 
     std::ifstream data(filename, std::ios::in | std::ios::binary);
-    if(!data){
+    if(!data) {
         std::cout << "\t\t\tfailed to open " + filename + "...\n";
         return;
     }
@@ -185,19 +193,19 @@ void insertBlob(sqlite3* db, std::string filename, std::string table_name, std::
     data.close();
 
     rc = sqlite3_prepare(db, sql.c_str(), -1, &stmt, 0);
-    if(rc != SQLITE_OK){
-        std::cout << "\t\t\t\tunable to prepare " << table_name << " statement: " << sqlite3_errmsg(db) << "\n\t(" + sql + ")\n";
+    if(rc != SQLITE_OK) {
+        err(table_name, "PREPARING TABLE FOR BLOB INSERTION:\n" + sql, sqlite3_errmsg(db));
     }
 
     rc = sqlite3_bind_blob(stmt, 1, buffer, size_img, SQLITE_STATIC);
-    if(rc != SQLITE_OK){
-        std::cout << "\t\t\t\tfailed to bind blob!\n";
+    if(rc != SQLITE_OK) {
+        err(table_name, "BINDING BLOB FOR INSERTION:\n" + sql, sqlite3_errmsg(db));
     }
 
     rc = sqlite3_step(stmt);
 
-    if(rc != SQLITE_DONE){
-        std::cout << "\t\t\t\tblob insertion failed: " << sqlite3_errmsg(db) << "\n\t(" + sql + ")\n";
+    if(rc != SQLITE_DONE) {
+        err(table_name, "INSERTING BLOB:\n" + sql, sqlite3_errmsg(db));
     }
 
     sqlite3_finalize(stmt);
@@ -207,8 +215,8 @@ void insertBlob(sqlite3* db, std::string filename, std::string table_name, std::
     std::cout << "\t\tblob successfully inserted!\n\n";
 }
 
-void addTables(sqlite3* db, std::vector<std::string> filenames){
-    for(const auto& filename : filenames){
+void addTables(sqlite3* db, std::vector<std::string> filenames) {
+    for(const auto& filename : filenames ) {
         std::cout << '\n';
         int rc;
 
@@ -217,7 +225,7 @@ void addTables(sqlite3* db, std::vector<std::string> filenames){
         Blocks blocks = getBlocks(filename, table_name);
 
     //if the blocks are empty, warn the user and move to the next table
-        if(blocks.size() == 0){
+        if(blocks.size() == 0) {
             std::cout << "\nno data was found in " << filename << "! skipping...";
             continue;
         }
@@ -234,13 +242,13 @@ void addTables(sqlite3* db, std::vector<std::string> filenames){
         std::string sql = "CREATE TABLE " + table_name + "(";
 
         //iterate through the entries to extract key/value pairs for the table
-        for(unsigned int e = 0; e < entries.size(); ++e){
+        for(unsigned int e = 0; e < entries.size(); ++e) {
             std::string diff = entries[e].first + " " + entries[e].second;
             sql += diff;
             if(e < entries.size() - 1) sql += ",";
             else sql += ")";
 
-            if(entries[e].second == "BLOB"){
+            if(entries[e].second == "BLOB") {
                 blob_keys.push_back(std::string(entries[e].first));
             }
 
@@ -250,13 +258,13 @@ void addTables(sqlite3* db, std::vector<std::string> filenames){
         std::cout << '\n';
 
         rc = sqlite3_exec(db, sql.c_str(), 0, 0, 0);
-        if(rc != SQLITE_OK){
-            std::cout << "\t\tFAILED TO CREATE TABLE " << table_name << " WITH ERROR CODE " << rc << "\n\t" << sql;
+        if(rc != SQLITE_OK) {
+            err(table_name, "CREATE TABLE", std::string("ERROR CODE " + std::to_string(rc)));
             continue;
         }
 
 //create the entries
-        for(unsigned int block = 1; block < blocks.size(); ++block){
+        for(unsigned int block = 1; block < blocks.size(); ++block) {
             Entry_Data blobs;
 
             std::cout << "\tcreating entry " << blocks[block][0] << '\n';
@@ -268,13 +276,13 @@ void addTables(sqlite3* db, std::vector<std::string> filenames){
             std::string values = "VALUES(";
 
 
-            for(unsigned int e = 0; e < entries.size(); ++e){
+            for(unsigned int e = 0; e < entries.size(); ++e) {
 
             //add key
                 insert += wrap(entries[e].first);
 
             //add value
-                if(std::find(blob_keys.begin(), blob_keys.end(), entries[e].first) != blob_keys.end()){
+                if(std::find(blob_keys.begin(), blob_keys.end(), entries[e].first) != blob_keys.end()) {
                     values += "NULL";
                     entries[e].second = "blob/" + entries[e].second;
                     blobs.push_back(entries[e]);
@@ -282,7 +290,7 @@ void addTables(sqlite3* db, std::vector<std::string> filenames){
                 else values += wrap(entries[e].second);
 
             //add commas or terminator as needed
-                if(e < entries.size() - 1){
+                if(e < entries.size() - 1) {
                     insert += ",";
                     values += ",";
                 }
@@ -296,12 +304,12 @@ void addTables(sqlite3* db, std::vector<std::string> filenames){
             sql = insert + values;
 
             rc = sqlite3_exec(db, sql.c_str(), 0, 0, 0);
-            if(rc != SQLITE_OK){
-                std::cout << "\n\nQUERY FAILED WITH ERROR CODE " << rc << ":\n\t" << sql << '\n';
+            if(rc != SQLITE_OK) {
+                err(table_name, sql, std::string("ERROR CODE " + std::to_string(rc)));
                 continue;
             }
 
-            for(const auto& blob : blobs){
+            for(const auto& blob : blobs) {
                 insertBlob(db, blob.second, table_name, entries[0].second, entries[0].first, blob.first);
             }
 

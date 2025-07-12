@@ -22,11 +22,27 @@
 #pragma once
 
 #include <sqlite3.h>
+
+#include <functional>
 #include <string>
 #include <vector>
 
 using Blocks = std::vector<std::vector<std::string>>;
 using Entry_Data = std::vector<std::pair<std::string, std::string>>;
+
+struct Error {
+    std::string table;
+    std::string operation;
+    std::string reason;
+};
+
+void err(const std::string& table, const std::string& operation, const std::string& reason);
+
+struct Export {
+    static std::function<void(Error)> getError;
+};
+
+void out(Error e);
 
 ////////////////////////////////////////////////////////////
 /// \brief extracts arg parameter
@@ -38,14 +54,13 @@ using Entry_Data = std::vector<std::pair<std::string, std::string>>;
 std::string extractArg(std::string arg);
 
 ////////////////////////////////////////////////////////////
-/// \brief gets filenames from the manifest file
+/// \brief gets filenames from the data subdirectory
 ///
-/// \param \b manifest_name filename of the manifest
-/// \param \b prefix the directory containing the JSON files
+/// \param \b prefix subdirectory containing the JSON files
 ///
 /// \return \b filenames locations of JSON files to be reserialized in the database
 ///
-std::vector<std::string> extractFilenames(std::string manifest_name, std::string prefix);
+std::vector<std::string> extractFilenames(std::string prefix);
 
 ////////////////////////////////////////////////////////////
 /// \brief converts JSON files to strings

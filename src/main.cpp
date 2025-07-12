@@ -23,27 +23,48 @@
 #include <fstream>
 #include <iostream>
 
-int main(int argc, char* argv[]){
-    //define names for the manifest file and the json subdirectory
-    std::string manifest_name = "manifest.txt",
-                     prefix = "data/",
-                     database_name = "data.db";
+void outputErrors(const std::vector<Error>& errors)
+{
+    const size_t size = errors.size();
+    std::cout << "\n" << size << " errors were encountered";
+    switch (size) {
+        case 0:
+            std::cout << "!";
+            break;
+        default:
+            std::cout << ":";
+    }
 
-    //parse args to change manifest_name and prefix
-    for(int c = 1; c < argc; c++){
+    for (const auto& error : errors) {
+        std::cout << "\n\tTable: " << error.table;
+        std::cout << "\n\tOperation: " << error.operation;
+        std::cout << "\n\tReason: " << error.reason;
+    }
+}
+
+int main(int argc, char* argv[])
+{
+    // assign error tracking callback
+    std::vector<Error> errors;
+    Export::getError = [&](Error e) {
+        errors.push_back(e);
+    };
+
+    std::string prefix = "data/";
+    std::string database_name = "data.db";
+
+    // parse args
+    for(int c = 1; c < argc; c++) {
         std::string arg(argv[c]);
 
         if(arg.length() < 2) continue;
 
-        if(arg[1] == 'm'){
-            manifest_name = extractArg(arg);
-        }
-        else if(arg[1] == 'p'){
+        if(arg[1] == 'p') { // prefix
             prefix = extractArg(arg);
             if(prefix.back() != '/') prefix += '/';
         }
-        else if(arg[1] == 'd'){
-            database_name = extractArg(arg);
+        else if(arg[1] == 'd') {
+            database_name = extractArg(arg); // database name
             if(database_name.find(".db") == std::string::npos) database_name += ".db";
         }
     }
@@ -54,32 +75,32 @@ int main(int argc, char* argv[]){
 
     //if the database fails to open for whatever reason,
         //attempt to close it and return error code 1
-    if(rc != SQLITE_OK){
+    if(rc != SQLITE_OK) {
         std::cout << "failed to open database, error " << sqlite3_errmsg(db) << '\n';
         sqlite3_close(db);
         return 1;
     }
-
     std::cout << database_name << " successfully opened!\n";
 
-    //extract the filenames from manifest.txt
-
     std::cout << "\nclearing database...\n";
-
     littleBobbyTables(db);
 
-    std::vector<std::string> filenames = extractFilenames(manifest_name, prefix);
+    std::vector<std::string> filenames = extractFilenames(prefix);
 
-    if(filenames.size() > 0){
+    if(filenames.size() > 0) {
         std::cout << "\nadding tables...\n";
-
         addTables(db, filenames);
-
         std::cout << "\ntables added!\n";
     }
     else{
-        std::cout << "\nno filenames were found! double check manifest.txt in the working directory!";
+        std::cout << "\nno filenames were found! double check that your subdirectory's prefix is correct, and that it contains files!";
     }
+
+    outputErrors(errors);
+
+    std::cout << "\n\nEnter any character to continue...\n";
+    char in;
+    std::cin >> in;
 
     return 0;
 }
