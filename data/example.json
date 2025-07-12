@@ -1,48 +1,48 @@
 {
 "BOOKS":[
 	{
-		"ISBN":"INT PRIMARY KEY NOT NULL",
-		"TITLE":"TEXT",
-		"AUTHOR":"TEXT",
-		"YEAR":"INT",
-		"COST":"REAL",
-		"COVER":"BLOB",
+		"ISBN":"INT PRIMARY KEY NOT NULL"
+		"TITLE":"TEXT"
+		"AUTHOR":"TEXT"
+		"YEAR":"INT"
+		"COST":"REAL"
+		"COVER":"BLOB"
 		"AUTHORPHOTO":"BLOB"
-	},
+	}
 	{
-		"ISBN":"0321563840",
-		"TITLE":"The C++ Programming Language",
-		"AUTHOR":"Bjarne Stroustrup",
-		"YEAR":"2013",
-		"COST":"79.99",
-		"COVER":"covers/The_C++_Programming_Language,_Fourth_Edition.jpg",
+		"ISBN":"0321563840"
+		"TITLE":"The C++ Programming Language"
+		"AUTHOR":"Bjarne Stroustrup"
+		"YEAR":"2013"
+		"COST":"79.99"
+		"COVER":"covers/The_C++_Programming_Language_Fourth_Edition.jpg"
 		"AUTHORPHOTO":"authors/bjarne.jpg"
-	},
+	}
 	{
-		"ISBN":"0141439475",
-		"TITLE":"Frankenstein, or The Modern Prometheus",
-		"AUTHOR":"Mary Wollstonecraft Shelley",
-		"YEAR":"1818",
-		"COST":"10.00",
-		"COVER":"covers/frankenstein.jpg",
+		"ISBN":"0141439475"
+		"TITLE":"Frankenstein or The Modern Prometheus"
+		"AUTHOR":"Mary Wollstonecraft Shelley"
+		"YEAR":"1818"
+		"COST":"10.00"
+		"COVER":"covers/frankenstein.jpg"
 		"AUTHORPHOTO":"authors/shelley.png"
-	},
+	}
 	{
-		"ISBN":"9780679601395",
-		"TITLE":"Invisible Man",
-		"AUTHOR":"Ralph Ellison",
-		"YEAR":"1952",
-		"COST":"13.99",
-		"COVER":"covers/invis.png",
+		"ISBN":"9780679601395"
+		"TITLE":"Invisible Man"
+		"AUTHOR":"Ralph Ellison"
+		"YEAR":"1952"
+		"COST":"13.99"
+		"COVER":"covers/invis.png"
 		"AUTHORPHOTO":"authors/ellison.png"
-	},
+	}
 	{
-		"ISBN":"9780679601395",
-		"TITLE":"Test",
-		"AUTHOR":"Test",
-		"YEAR":"1952",
-		"COST":"13.99",
-		"COVER":"covers/invis.png",
+		"ISBN":"9780679601395"
+		"TITLE":"Test"
+		"AUTHOR":"Test"
+		"YEAR":"1952"
+		"COST":"13.99"
+		"COVER":"covers/invis.png"
 		"AUTHORPHOTO":"authors/ellison.png"
 	}
 ]
