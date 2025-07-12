@@ -33,6 +33,7 @@
 
 # Output
 /bin/
+/release/
 
 # Code::Blocks project files
 *.cbp
