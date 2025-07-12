@@ -36,9 +36,9 @@ void outputErrors(const std::vector<Error>& errors)
     }
 
     for (const auto& error : errors) {
-        std::cout << "\n\tTable: " << error.table;
-        std::cout << "\n\tOperation: " << error.operation;
-        std::cout << "\n\tReason: " << error.reason;
+        std::cout << "\n" << error.table;
+        std::cout << "\n\t" << error.operation;
+        std::cout << "\n\t" << error.reason;
     }
 }
 
