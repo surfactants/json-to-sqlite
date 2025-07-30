@@ -1,9 +1,12 @@
 # json-to-sqlite
-Parses JSON files and stores the results in a SQLite database.
+## About
+Written by [surfactants](github.com/surfactants)
 
 Written with the SQLite 3.38.0 amalgamation [(direct download)](https://www.sqlite.org/2022/sqlite-amalgamation-3380000.zip)  - though I do not see any reason why the newest version wouldn't work.
 
-## to use
+Parses JSON files and stores the results in a SQLite database.
+
+## Usage
 - Simply add your JSON files to `data/`. You can store them in a separate subdirectory, but that title must be passed as an arg.
 - Binary files go in `blob/`.
 
@@ -13,7 +16,7 @@ The JSON subdirectory, and output filename can  be specified with passed args:
 - `-p:json_directory/` (the trailing slash will be appended if missing)
 - `-d:database_name.db` (the file extension will be appended if missing)
 
-## notes
+## Notes
 - Each table must be defined in its own JSON file.
 - Each JSON file must begin with a dummy entry, formatted as `"KEY":"TYPE"` (i.e. `"COUNT":"INT"`).
 - Primary key must be identified in the type string (i.e. `"NAME":"TEXT PRIMARY KEY NOT NULL"`)
