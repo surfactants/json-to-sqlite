@@ -1,6 +1,6 @@
 # json-to-sqlite
 ## About
-Written by [surfactants](github.com/surfactants), with the SQLite 3.38.0 amalgamation [(direct download)](https://www.sqlite.org/2022/sqlite-amalgamation-3380000.zip - though I do not see any reason why the newest version wouldn't work.)
+Written by [surfactants](github.com/surfactants), with the SQLite 3.38.0 amalgamation [(direct download)](https://www.sqlite.org/2022/sqlite-amalgamation-3380000.zip)
 
 Parses JSON files and stores the results in a SQLite database.
 
@@ -21,6 +21,6 @@ The JSON subdirectory, and output filename can  be specified with passed args:
 - BLOB fields require a filename, including any subdirectories, for the value (i.e. `"DATA":"images/img.jpg"`)
 	- *the referred file must exist in `blob/` or the program will undergo rapid unplanned disassembly!*
 
-Here is the packed example data, seen in `DB Browser for SQLite`:
+Here is the packed example data, as seen in [DB Browser for SQLite](sqlitebrowser/sqlitebrowser):
 
 ![a screenshot from DB Browser, showing a single entry in a BOOKS table which matches the data found in example.json](https://github.com/surfactants/json-to-sqlite/blob/main/example.png)
