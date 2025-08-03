@@ -1,8 +1,6 @@
 # json-to-sqlite
 ## About
-Written by [surfactants](github.com/surfactants)
-
-Written with the SQLite 3.38.0 amalgamation [(direct download)](https://www.sqlite.org/2022/sqlite-amalgamation-3380000.zip)  - though I do not see any reason why the newest version wouldn't work.
+Written by [surfactants](github.com/surfactants), with the SQLite 3.38.0 amalgamation [(direct download)](https://www.sqlite.org/2022/sqlite-amalgamation-3380000.zip - though I do not see any reason why the newest version wouldn't work.)
 
 Parses JSON files and stores the results in a SQLite database.
 
